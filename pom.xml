@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tistory.hskimsky</groupId>
+    <artifactId>kosdaq</artifactId>
+    <version>0.1-SNAPSHOT</version>
+
+    <packaging>jar</packaging>
+    <name>KOSDAQ collector</name>
+    <url>http://hskimsky.tistory.com</url>
+    <inceptionYear>2017</inceptionYear>
+
+    <properties>
+        <!-- Project -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Plugin -->
+        <compiler.plugin.version>3.6.1</compiler.plugin.version>
+
+        <!-- Test -->
+        <junit.version>4.12</junit.version>
+        <!-- Guava -->
+        <guava.version>21.0</guava.version>
+        <!-- JSoup -->
+        <jsoup.version>1.10.2</jsoup.version>
+        <!-- Commons HttpClient -->
+        <httpcomponents.version>4.5.3</httpcomponents.version>
+        <!-- hadoop -->
+        <hadoop.version>2.7.3</hadoop.version>
+        <!-- hbase -->
+        <hbase.version>1.1.2.2.5.3.0-37</hbase.version>
+    </properties>
+
+    <dependencies>
+        <!-- ========== -->
+        <!--  Test API  -->
+        <!-- ========== -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- ============== -->
+        <!--  Google Guava  -->
+        <!-- ============== -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <!-- ======= -->
+        <!--  JSoup  -->
+        <!-- ======= -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+        </dependency>
+
+        <!-- ================ -->
+        <!--  Apache Commons  -->
+        <!-- ================ -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpcomponents.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${httpcomponents.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.mahout.commons</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>2.0-mahout</version>
+        </dependency>
+
+        <!-- =================== -->
+        <!--  Hadoop EcoSystems  -->
+        <!-- =================== -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>${hadoop.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>${hadoop.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-minicluster</artifactId>
+            <version>${hadoop.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-server</artifactId>
+            <version>${hbase.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>${hbase.version}</version>
+        </dependency>
+
+        <!-- ======================= -->
+        <!--  Splittable Gzip Codec  -->
+        <!-- ======================= -->
+        <!-- https://github.com/nielsbasjes/splittablegzip -->
+        <dependency>
+            <groupId>nl.basjes.hadoop</groupId>
+            <artifactId>splittablegzip</artifactId>
+            <version>1.2</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>hortonworks</id>
+            <name>Hortonworks Maven Repository</name>
+            <!--<url>http://repo.hortonworks.com/content/repositories/central</url>-->
+            <url>http://repo.hortonworks.com/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.plugin.version}</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <!--<configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.tistory.com.hskimsky.lotto_collector.LottoCollector</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>-->
+                    </execution>
+                </executions>
+            </plugin>
+            <!--<plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    &lt;!&ndash;<archive>
+                        <manifest>
+                            <mainClass>com.tistory.hskimsky.copyvmware.Main</mainClass>
+                        </manifest>
+                    </archive>&ndash;&gt;
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>GetCode</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
+        </plugins>
+    </build>
+
+   <developers>
+        <developer>
+            <id>haneul.kim</id>
+            <email>hskimsky@gmail.com</email>
+            <name>Haneul, Kim</name>
+            <roles>
+                <role>manager</role>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+</project>

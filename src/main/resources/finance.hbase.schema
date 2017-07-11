@@ -1,0 +1,12 @@
+finance hbase
+Version 1.1.2.2.5.3.0-37
+
+recordkey
+[code%region number]^[code]
+
+quote:[date]
+[start]^[high]^[low]^[finish]^[quantity]
+
+disable 'finance'
+drop 'finance'
+create 'finance', {NAME => 'quote', COMPRESSION => 'gz'}, {SPLITS => ['0', '1', '2']}

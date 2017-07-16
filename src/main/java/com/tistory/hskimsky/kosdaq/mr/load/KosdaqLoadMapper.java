@@ -45,38 +45,37 @@ public class KosdaqLoadMapper extends Mapper<LongWritable, Text, ImmutableBytesW
         context.getCounter(Constants.Counters.GROUP_NAME.name(), Constants.Counters.MAP_READ_FILE_COUNTER_NAME.name()).increment(1);
     }
 
-    private String toYYYYMMDD(String date) throws ParseException {
-        return this.outSdf.format(this.inSdf.parse(date));
-    }
-
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         context.getCounter(Constants.Counters.GROUP_NAME.name(), Constants.Counters.MAP_INPUT_RECORDS_COUNTER_NAME.name()).increment(1);
+
+        String[] tokens = null;
+        Date date = null;
         try {
-            String[] tokens = value.toString().split(String.format("\\%s", this.inputSeparator), Integer.MAX_VALUE);
-
-            String code = tokens[Schema.Quote.code.ordinal()];
-            int dist_key = Integer.parseInt(code) % 3;
-            ImmutableBytesWritable rowKey = new ImmutableBytesWritable(Bytes.toBytes(dist_key + this.outputSeparator + code));
-
-            Put put = new Put(rowKey.get());
-            Date date = this.inSdf.parse(tokens[Schema.Quote.date.ordinal()]);
-            StringBuilder map_out_val = new StringBuilder();
-            map_out_val.append(tokens[Schema.Quote.start.ordinal()].replaceAll(",", "")).append(this.outputSeparator);
-            map_out_val.append(tokens[Schema.Quote.high.ordinal()].replaceAll(",", "")).append(this.outputSeparator);
-            map_out_val.append(tokens[Schema.Quote.low.ordinal()].replaceAll(",", "")).append(this.outputSeparator);
-            map_out_val.append(tokens[Schema.Quote.finish.ordinal()].replaceAll(",", "")).append(this.outputSeparator);
-            map_out_val.append(tokens[Schema.Quote.quantity.ordinal()].replaceAll(",", ""));
-
-            // put 'finance', '2^205100', 'quote:20170703', '4880^4935^4785^4855^412321', 1499007600000
-            // [code%region number]^[code]
-            // quote:[date]
-            // [start]^[high]^[low]^[finish]^[quantity]
-            put.addColumn(Bytes.toBytes(COLUMN_FAMILY_QUOTE), Bytes.toBytes(this.outSdf.format(date)), date.getTime(), Bytes.toBytes(map_out_val.toString()));
-            context.write(rowKey, put);
-            context.getCounter(Constants.Counters.GROUP_NAME.name(), Constants.Counters.MAP_OUT_COUNTER_NAME.name()).increment(1);
+            tokens = value.toString().split(String.format("\\%s", this.inputSeparator), Integer.MAX_VALUE);
+            date = this.inSdf.parse(tokens[Schema.Quote.date.ordinal()]);
         } catch (ParseException e) {
             new RuntimeException("map parse error!! value = " + value.toString());
         }
+
+        String code = tokens[Schema.Quote.code.ordinal()];
+        int dist_key = Integer.parseInt(code) % 3;
+        ImmutableBytesWritable rowKey = new ImmutableBytesWritable(Bytes.toBytes(dist_key + this.outputSeparator + code));
+
+        Put put = new Put(rowKey.get());
+        StringBuilder map_out_val = new StringBuilder();
+        map_out_val.append(tokens[Schema.Quote.start.ordinal()].replaceAll(",", "")).append(this.outputSeparator);
+        map_out_val.append(tokens[Schema.Quote.high.ordinal()].replaceAll(",", "")).append(this.outputSeparator);
+        map_out_val.append(tokens[Schema.Quote.low.ordinal()].replaceAll(",", "")).append(this.outputSeparator);
+        map_out_val.append(tokens[Schema.Quote.finish.ordinal()].replaceAll(",", "")).append(this.outputSeparator);
+        map_out_val.append(tokens[Schema.Quote.quantity.ordinal()].replaceAll(",", ""));
+
+        // put 'finance', '2^205100', 'quote:20170703', '4880^4935^4785^4855^412321', 1499007600000
+        // [code%region number]^[code]
+        // quote:[date]
+        // [start]^[high]^[low]^[finish]^[quantity]
+        put.addColumn(Bytes.toBytes(COLUMN_FAMILY_QUOTE), Bytes.toBytes(this.outSdf.format(date)), date.getTime(), Bytes.toBytes(map_out_val.toString()));
+        context.write(rowKey, put);
+        context.getCounter(Constants.Counters.GROUP_NAME.name(), Constants.Counters.MAP_OUT_COUNTER_NAME.name()).increment(1);
     }
 }

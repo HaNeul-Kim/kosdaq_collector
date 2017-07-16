@@ -118,7 +118,7 @@ public class Quote {
 
     @Override
     public String toString() {
-        return "Quote2{" +
+        return "Quote{" +
                 "date='" + date + '\'' +
                 ", start='" + start + '\'' +
                 ", high='" + high + '\'' +

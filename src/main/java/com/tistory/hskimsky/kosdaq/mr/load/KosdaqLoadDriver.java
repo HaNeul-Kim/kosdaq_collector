@@ -48,7 +48,7 @@ public class KosdaqLoadDriver extends Configured implements Tool {
         String rawDate = args[0];
         String tableName = args.length > 1 ? args[1] : "finance";
 
-        Path inputPath = new Path("hdfs://nn/data/finance/" + rawDate + "/quotes*.gz");
+        Path inputPath = new Path("hdfs://nn/data/kosdaq/" + rawDate + "/quotes*.gz");
         Path outputPath = new Path("hdfs://nn/user/flamingo/mr/output/kosdaq/" + rawDate);
 
         Configuration conf = this.newConf();
@@ -108,7 +108,7 @@ public class KosdaqLoadDriver extends Configured implements Tool {
         conf.set("fs.hdfs.impl", DistributedFileSystem.class.getName());
         conf.set("mapreduce.job.reduce.slowstart.completedmaps", "0.9");
 
-        // conf.setInt("io.file.buffer.size", 4 * 1024);
+        conf.setInt("io.file.buffer.size", 4 * 1024);
         conf.setStrings("io.compression.codecs",
                 DefaultCodec.class.getName(),
                 SplittableGzipCodec.class.getName(),
